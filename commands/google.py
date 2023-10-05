@@ -21,8 +21,7 @@ class google(Commands):
         results = ddg(query, max_results=num_results)
         if not results:
             return json.dumps(search_results)
-        for j in results:
-            search_results.append(j)
+        search_results.extend(iter(results))
         return json.dumps(search_results, ensure_ascii=False, indent=4)
 
     def google_official_search(

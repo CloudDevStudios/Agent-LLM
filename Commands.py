@@ -6,18 +6,12 @@ from Config.Agent import Agent
 
 class Commands:
     def __init__(self, agent_name: str = "Agent-LLM", load_commands_flag: bool = True):
-        if agent_name == "undefined":
-            self.agent_name = "Agent-LLM"
-        else:
-            self.agent_name = agent_name
+        self.agent_name = "Agent-LLM" if agent_name == "undefined" else agent_name
         self.CFG = Agent(self.agent_name)
         self.agent_folder = self.CFG.create_agent_folder(self.agent_name)
         # self.agent_config_file = self.CFG.create_agent_config_file(self.agent_folder)
         self.agent_config = self.CFG.load_agent_config(self.agent_name)
-        if load_commands_flag:
-            self.commands = self.load_commands()
-        else:
-            self.commands = []
+        self.commands = self.load_commands() if load_commands_flag else []
         self.available_commands = self.get_available_commands()
 
     def get_available_commands(self):
@@ -28,10 +22,7 @@ class Commands:
                 "commands" in self.agent_config
                 and friendly_name in self.agent_config["commands"]
             ):
-                if (
-                    self.agent_config["commands"][friendly_name] == "true"
-                    or self.agent_config["commands"][friendly_name] == True
-                ):
+                if self.agent_config["commands"][friendly_name] in ["true", True]:
                     # Add command to list of commands to return
                     available_commands.append(
                         {
@@ -79,14 +70,11 @@ class Commands:
         return commands
 
     def get_command_params(self, func):
-        params = {}
         sig = signature(func)
-        for name, param in sig.parameters.items():
-            if param.default == Parameter.empty:
-                params[name] = None
-            else:
-                params[name] = param.default
-        return params
+        return {
+            name: None if param.default == Parameter.empty else param.default
+            for name, param in sig.parameters.items()
+        }
 
     def find_command(self, command_name: str):
         for name, module, function_name, params in self.commands:
@@ -97,8 +85,7 @@ class Commands:
 
     def get_commands_list(self):
         self.commands = self.load_commands(agent_name=self.agent_name)
-        commands_list = [command_name for command_name, _, _ in self.commands]
-        return commands_list
+        return [command_name for command_name, _, _ in self.commands]
 
     def execute_command(self, command_name: str, command_args: dict):
         command_function, module, params = self.find_command(command_name)
@@ -107,5 +94,4 @@ class Commands:
         for name, value in command_args.items():
             if name in params:
                 params[name] = value
-        output = command_function(module, **params)
-        return output
+        return command_function(module, **params)

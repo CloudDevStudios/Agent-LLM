@@ -52,7 +52,7 @@ class AgentLLM:
             c for c in agent_name if c in string.ascii_letters
         )
         self.collection = self.chroma_client.get_or_create_collection(
-            name=str(stripped_agent_name).lower(),
+            name=stripped_agent_name.lower(),
             metadata={"hnsw:space": "cosine"},
             embedding_function=self.embedding_function,
         )
@@ -129,13 +129,10 @@ class AgentLLM:
                     command = command.strip()
                     # Check if the command starts with a number and strip out everything until the first letter
                     if command and command[0].isdigit():
-                        first_letter = re.search(r"[a-zA-Z]", command)
-                        if first_letter:
+                        if first_letter := re.search(r"[a-zA-Z]", command):
                             command = command[first_letter.start() :]
                     command_name, command_args = None, {}
-                    # Extract command name and arguments using regex
-                    command_regex = re.search(r"(\w+)\((.*)\)", command)
-                    if command_regex:
+                    if command_regex := re.search(r"(\w+)\((.*)\)", command):
                         command_name, args_str = command_regex.groups()
                         if args_str:
                             # Parse arguments string into a dictionary
@@ -157,13 +154,12 @@ class AgentLLM:
                         response_parts.append(
                             f"\n\n{self.commands.execute_command(command_name, command_args)}"
                         )
+                    elif command == "None.":
+                        response_parts.append(f"\n\nNo commands were executed.")
                     else:
-                        if command == "None.":
-                            response_parts.append(f"\n\nNo commands were executed.")
-                        else:
-                            response_parts.append(
-                                f"\n\nCommand not recognized: {command}"
-                            )
+                        response_parts.append(
+                            f"\n\nCommand not recognized: {command}"
+                        )
                 self.response = self.response.replace(
                     commands[0], "".join(response_parts)
                 )
@@ -198,7 +194,7 @@ class AgentLLM:
                 interaction["message"]
                 for interaction in interactions[-top_results_num:]
             ]
-            context = self.chunk_content("\n\n".join(context))[-top_results_num:]
+            return self.chunk_content("\n\n".join(context))[-top_results_num:]
         else:
             count = self.collection.count()
             if count == 0:
@@ -208,13 +204,11 @@ class AgentLLM:
                 n_results=min(top_results_num, count),
                 include=["metadatas"],
             )
-            context = [item["result"] for item in results["metadatas"][0]]
-        return context
+            return [item["result"] for item in results["metadatas"][0]]
 
     def get_prompt_with_context(self, task: str, context: List[str]) -> str:
         context_str = "\n\n".join(context)
-        prompt = f"Task: {task}\n\nContext: {context_str}\n\nResponse:"
-        return prompt
+        return f"Task: {task}\n\nContext: {context_str}\n\nResponse:"
 
     def chunk_content(self, content: str, max_length: int = 500) -> List[str]:
         content_chunks = []
@@ -351,9 +345,7 @@ class AgentLLM:
                 elif prompt_type == "command":
                     command = prompt.strip()
                     command_name, command_args = None, {}
-                    # Extract command name and arguments using regex
-                    command_regex = re.search(r"(\w+)\((.*)\)", command)
-                    if command_regex:
+                    if command_regex := re.search(r"(\w+)\((.*)\)", command):
                         command_name, args_str = command_regex.groups()
                         if args_str:
                             # Parse arguments string into a dictionary

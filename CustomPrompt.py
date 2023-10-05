@@ -19,12 +19,11 @@ class CustomPrompt:
         return prompt
 
     def get_prompts(self):
-        # Get all files in prompts folder that end in .txt and replace .txt with empty string
-        prompts = []
-        for file in os.listdir("prompts"):
-            if file.endswith(".txt"):
-                prompts.append(file.replace(".txt", ""))
-        return prompts
+        return [
+            file.replace(".txt", "")
+            for file in os.listdir("prompts")
+            if file.endswith(".txt")
+        ]
 
     def delete_prompt(self, prompt_name):
         os.remove(os.path.join("prompts", f"{prompt_name}.txt"))

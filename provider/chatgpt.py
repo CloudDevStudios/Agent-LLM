@@ -43,8 +43,7 @@ class ChatgptProvider:
 
     def interact(self, head_number, question):
         self.switch_to_tab(head_number)
-        response = self.driver.interact(question)
-        return response
+        return self.driver.interact(question)
 
     def reset_thread(self, head_number):
         self.switch_to_tab(head_number)

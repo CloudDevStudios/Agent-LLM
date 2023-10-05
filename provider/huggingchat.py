@@ -16,9 +16,7 @@ class HuggingchatProvider:
         url = f"https://huggingface.co/chat/conversation/{conversation_id}"
         max_tokens = int(self.MAX_TOKENS) - len(prompt)
 
-        if max_tokens > 1904:
-            max_tokens = 1904
-
+        max_tokens = min(max_tokens, 1904)
         res = session.post(
             url=url,
             json={

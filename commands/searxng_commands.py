@@ -23,7 +23,7 @@ class searxng_commands(Commands):
         }
         response = requests.get(searx_url, params=payload)
         results = response.json()
-        summaries = [
-            result["title"] + " - " + result["url"] for result in results["results"]
+        return [
+            result["title"] + " - " + result["url"]
+            for result in results["results"]
         ]
-        return summaries

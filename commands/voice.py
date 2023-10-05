@@ -38,14 +38,13 @@ class voice(Commands):
         )
         response = requests.get(tts_url)
 
-        if response.status_code == 200:
-            with open("speech.mp3", "wb") as f:
-                f.write(response.content)
-            playsound("speech.mp3")
-            os.remove("speech.mp3")
-            return True
-        else:
+        if response.status_code != 200:
             return False
+        with open("speech.mp3", "wb") as f:
+            f.write(response.content)
+        playsound("speech.mp3")
+        os.remove("speech.mp3")
+        return True
 
     def _elevenlabs_speech(self, text: str, voice_index: int = 0) -> bool:
         voices = ["ErXwobaYiN019PkySvjV", "EXAVITQu4vr4xnSDxMaL"]
@@ -57,14 +56,13 @@ class voice(Commands):
         tts_url = f"https://api.elevenlabs.io/v1/text-to-speech/{voices[voice_index]}"
         response = requests.post(tts_url, headers=headers, json={"text": text})
 
-        if response.status_code == 200:
-            with open("speech.mpeg", "wb") as f:
-                f.write(response.content)
-            playsound("speech.mpeg", True)
-            os.remove("speech.mpeg")
-            return True
-        else:
+        if response.status_code != 200:
             return False
+        with open("speech.mpeg", "wb") as f:
+            f.write(response.content)
+        playsound("speech.mpeg", True)
+        os.remove("speech.mpeg")
+        return True
 
     def _macos_speech(self, text: str, voice_index: int = 0) -> bool:
         if voice_index == 0:

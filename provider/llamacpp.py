@@ -17,7 +17,7 @@ class LlamacppProvider:
         self.MAX_TOKENS = MAX_TOKENS
         if MODEL_PATH:
             try:
-                self.MAX_TOKENS = int(self.MAX_TOKENS)
+                self.MAX_TOKENS = self.MAX_TOKENS
             except:
                 self.MAX_TOKENS = 2000
             self.model = Model(ggml_model=MODEL_PATH, n_ctx=self.MAX_TOKENS)

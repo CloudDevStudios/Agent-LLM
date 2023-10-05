@@ -71,9 +71,9 @@ class web_selenium(Commands):
             EC.presence_of_element_located((By.TAG_NAME, "body"))
         )
 
-        # Check for captcha and solve it
-        captcha_element = driver.find_element_by_css_selector('img[src^="/captcha/"]')
-        if captcha_element:
+        if captcha_element := driver.find_element_by_css_selector(
+            'img[src^="/captcha/"]'
+        ):
             captcha_image = captcha_element.get_attribute("src")
             solver = CaptchaSolver("browser")
             captcha_solution = solver.solve_captcha(captcha_image)

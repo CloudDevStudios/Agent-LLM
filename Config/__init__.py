@@ -68,20 +68,21 @@ class Config:
             os.makedirs(directory)
 
     def get_providers(self):
-        providers = []
-        for provider in glob.glob("provider/*.py"):
-            if "__init__.py" not in provider:
-                providers.append(os.path.splitext(os.path.basename(provider))[0])
-        return providers
+        return [
+            os.path.splitext(os.path.basename(provider))[0]
+            for provider in glob.glob("provider/*.py")
+            if "__init__.py" not in provider
+        ]
 
     def get_agents(self):
         memories_dir = "agents"
         if not os.path.exists(memories_dir):
             os.makedirs(memories_dir)
-        agents = []
-        for file in os.listdir(memories_dir):
-            if file.endswith(".yaml"):
-                agents.append(file.replace(".yaml", ""))
+        agents = [
+            file.replace(".yaml", "")
+            for file in os.listdir(memories_dir)
+            if file.endswith(".yaml")
+        ]
         output = []
         if agents:
             for agent in agents:

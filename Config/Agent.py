@@ -67,10 +67,7 @@ class Agent(Config):
 
     def get_provider(self):
         config_file = self.get_agent_config()
-        if "provider" in config_file:
-            return config_file["provider"]
-        else:
-            return "openai"
+        return config_file["provider"] if "provider" in config_file else "openai"
 
     def create_agent_folder(self, agent_name):
         agent_folder = f"agents/{agent_name}"
@@ -81,14 +78,11 @@ class Agent(Config):
         return agent_folder
 
     def get_command_params(self, func):
-        params = {}
         sig = signature(func)
-        for name, param in sig.parameters.items():
-            if param.default == Parameter.empty:
-                params[name] = None
-            else:
-                params[name] = param.default
-        return params
+        return {
+            name: None if param.default == Parameter.empty else param.default
+            for name, param in sig.parameters.items()
+        }
 
     def load_commands(self):
         commands = []
@@ -104,8 +98,7 @@ class Agent(Config):
         return commands
 
     def load_command_files(self):
-        command_files = glob.glob("commands/*.py")
-        return command_files
+        return glob.glob("commands/*.py")
 
     def create_agent_config_file(self, agent_name, provider_settings, commands):
         agent_dir = os.path.join("agents", agent_name)
@@ -130,23 +123,24 @@ class Agent(Config):
     def load_agent_config(self, agent_name):
         try:
             with open(
-                os.path.join("agents", agent_name, "config.json")
-            ) as agent_config:
+                        os.path.join("agents", agent_name, "config.json")
+                    ) as agent_config:
                 try:
-                    agent_config_data = json.load(agent_config)
-                    return agent_config_data
+                    return json.load(agent_config)
                 except json.JSONDecodeError:
-                    agent_config_data = {}
-                    # Populate the agent_config with all commands enabled
-                    agent_config_data["commands"] = {
-                        command_name: "false"
-                        for command_name, _, _ in self.load_commands(agent_name)
-                    }
-                    agent_config_data["settings"] = {
-                        "provider": "huggingchat",
-                        "AI_MODEL": "openassistant",
-                        "AI_TEMPERATURE": 0.4,
-                        "MAX_TOKENS": 2000,
+                    agent_config_data = {
+                        "commands": {
+                            command_name: "false"
+                            for command_name, _, _ in self.load_commands(
+                                agent_name
+                            )
+                        },
+                        "settings": {
+                            "provider": "huggingchat",
+                            "AI_MODEL": "openassistant",
+                            "AI_TEMPERATURE": 0.4,
+                            "MAX_TOKENS": 2000,
+                        },
                     }
                     # Save the updated agent_config to the file
                     with open(
@@ -224,8 +218,7 @@ class Agent(Config):
             agent_file = os.path.abspath(f"agents/{self.AGENT_NAME}/config.json")
             if os.path.exists(agent_file):
                 with open(agent_file, "r") as f:
-                    file_content = f.read().strip()
-                    if file_content:
+                    if file_content := f.read().strip():
                         agent_config = json.loads(file_content)
                         break
                     else:

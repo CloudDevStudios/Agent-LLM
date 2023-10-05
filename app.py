@@ -294,8 +294,7 @@ async def get_task_status(agent_name: str):
 
 @app.get("/api/chain", tags=["Chain"])
 async def get_chains():
-    chains = Chain().get_chains()
-    return chains
+    return Chain().get_chains()
 
 
 @app.get("/api/chain/{chain_name}", tags=["Chain"])

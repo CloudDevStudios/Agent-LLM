@@ -10,10 +10,11 @@ def get_provider_options(provider_name):
     module = importlib.import_module(f"provider.{provider_name}")
     provider_class = getattr(module, f"{provider_name.capitalize()}Provider")
     signature = inspect.signature(provider_class.__init__)
-    options = [
-        param for param in signature.parameters if param != "self" and param != "kwargs"
+    return [
+        param
+        for param in signature.parameters
+        if param not in ["self", "kwargs"]
     ]
-    return options
 
 
 class Provider:
@@ -33,11 +34,11 @@ class Provider:
         return getattr(self.instance, attr)
 
     def get_providers(self):
-        providers = []
-        for provider in glob.glob("provider/*.py"):
-            if "__init__.py" not in provider:
-                providers.append(os.path.splitext(os.path.basename(provider))[0])
-        return providers
+        return [
+            os.path.splitext(os.path.basename(provider))[0]
+            for provider in glob.glob("provider/*.py")
+            if "__init__.py" not in provider
+        ]
 
     def install_requirements(self):
         requirements = getattr(self.instance, "requirements", [])

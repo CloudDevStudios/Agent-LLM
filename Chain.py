@@ -7,8 +7,7 @@ from AgentLLM import AgentLLM
 class Chain:
     def get_chain(self, chain_name):
         chain_steps = os.listdir(os.path.join("chains", chain_name))
-        chain_data = {}
-        chain_data[chain_name] = []
+        chain_data = {chain_name: []}
         for step in chain_steps:
             step_number = step.split("-")[0]
             agent_name = step.split("-")[1]
@@ -27,8 +26,7 @@ class Chain:
         return chain_data
 
     def get_chains(self):
-        chains = os.listdir("chains")
-        return chains
+        return os.listdir("chains")
 
     def add_chain(self, chain_name):
         os.mkdir(os.path.join("chains", chain_name))
@@ -107,8 +105,7 @@ class Chain:
             # Shift all the steps in between the new and old step number down by 1
             for i in range(step_number - 1, new_step_number - 1, -1):
                 old_pattern = os.path.join("chains", chain_name, f"{i}-*-*")
-                old_files = glob.glob(old_pattern)
-                if old_files:
+                if old_files := glob.glob(old_pattern):
                     old_file = old_files[0]
                     _, old_agent_name, old_prompt_type = os.path.splitext(
                         os.path.basename(old_file)
@@ -119,13 +116,11 @@ class Chain:
                         f"{i + 1}-{old_agent_name}-{old_prompt_type}",
                     )
                     os.rename(old_file, new_file)
-        # If the step is moving down
         elif new_step_number > step_number:
             # Shift all the steps in between the old and new step number up by 1
             for i in range(step_number + 1, new_step_number + 1):
                 old_pattern = os.path.join("chains", chain_name, f"{i}-*-*")
-                old_files = glob.glob(old_pattern)
-                if old_files:
+                if old_files := glob.glob(old_pattern):
                     old_file = old_files[0]
                     _, old_agent_name, old_prompt_type = os.path.splitext(
                         os.path.basename(old_file)

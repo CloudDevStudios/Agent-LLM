@@ -68,12 +68,10 @@ class microsoft_365_email(Commands):
             response = service.users().messages().list(userId="me").execute()
             emails = response.get("value", [])
 
-            result = []
-            for email in emails:
-                result.append(f"Email ID: {email['id']}, Subject: {email['subject']}")
-
-            return result
-
+            return [
+                f"Email ID: {email['id']}, Subject: {email['subject']}"
+                for email in emails
+            ]
         except HttpError as error:
             return [f"Error checking email: {error}"]
 

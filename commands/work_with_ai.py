@@ -16,9 +16,7 @@ class work_with_ai(Commands):
                     )
 
     def ask(self, prompt: str) -> str:
-        response = AgentLLM().run(prompt, commands_enabled=False)
-        return response
+        return AgentLLM().run(prompt, commands_enabled=False)
 
     def instruct(self, prompt: str) -> str:
-        response = AgentLLM().run(prompt, commands_enabled=True)
-        return response
+        return AgentLLM().run(prompt, commands_enabled=True)
